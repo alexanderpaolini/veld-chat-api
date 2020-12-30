@@ -46,7 +46,7 @@ export class Client extends EventEmitter {
     this.socket.on('ready', (data: ReadyPayload) => {
       this.socket.emit("message:create", { content: "/nick " + options.name, channelId: data.mainChannel });
       data.channels.forEach(channel => {
-        this.channels.set(channel.id, new Channel(channel.id, this));
+        this.channels.set(channel.id, new Channel(channel, this));
       })
       data.members.forEach(member => {
         this.users.set(member.id, member);
@@ -59,7 +59,7 @@ export class Client extends EventEmitter {
       this.users.delete(user.id);
     });
     this.socket.on('channel:create', (channel: RawChannel) => {
-      this.channels.set(channel.id, new Channel(channel.id, this));
+      this.channels.set(channel.id, new Channel(channel, this));
     });
     this.socket.on('channel:delete', (channel: RawChannel) => {
       this.channels.delete(channel.id);
@@ -76,5 +76,6 @@ export class Client extends EventEmitter {
       headers: { "content-type": "application/json", authorization: `Bearer ${this.token}` },
       body: JSON.stringify(data)
     })
+    return true;
   }
 }

@@ -12,7 +12,7 @@ export class Message {
   mentions: string[];
   constructor(data: RawMessage, client: Client) {
     this.id = data.id;
-    this.channel = new Channel(data.channelId, client);
+    this.channel = new Channel(client.channels.get(data.channelId), client);
     this.user = client.users.get(data.user);
     this.content = data.content;
     this.client = client;
