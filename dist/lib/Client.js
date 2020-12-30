@@ -15,7 +15,7 @@ class Client extends events_1.EventEmitter {
     constructor(token, options) {
         super();
         // Logging and Connecting
-        this.socket = socket_io_client_1.default("ws://chat-gateway.veld.dev");
+        this.socket = socket_io_client_1.default("https://chat-gateway.veld.dev");
         this.logger = new loggers_1.default.Logger({ debug: options.debug, catch: false, colors: true, newLine: false, method: console.log });
         // Options
         this.token = token;

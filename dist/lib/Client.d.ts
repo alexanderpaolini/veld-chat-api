@@ -1,5 +1,5 @@
+/// <reference types="socket.io-client" />
 /// <reference types="node" />
-import { Socket } from "socket.io-client";
 import { Logger } from 'loggers';
 import { EventEmitter } from 'events';
 import { Channel } from './Channel';
@@ -9,7 +9,7 @@ interface ClientOptions {
     name?: string;
 }
 export declare class Client extends EventEmitter {
-    socket: typeof Socket;
+    socket: SocketIOClient.Socket;
     logger: Logger;
     token: string;
     private debug;
