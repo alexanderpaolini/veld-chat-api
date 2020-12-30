@@ -1,4 +1,4 @@
-import socket from "socket.io-client";
+import socket, { Socket } from "socket.io-client";
 import fetch from 'node-fetch';
 import loggers, { Logger } from 'loggers';
 import { EventEmitter } from 'events';
@@ -19,7 +19,7 @@ interface ClientOptions {
 }
 
 export class Client extends EventEmitter {
-  socket: socket;
+  socket: typeof Socket;
   logger: Logger;
   token: string;
   private debug: boolean;
@@ -28,7 +28,7 @@ export class Client extends EventEmitter {
   constructor(token: string, options: ClientOptions) {
     super()
     // Logging and Connecting
-    this.socket = socket("https://chat-gateway.veld.dev")
+    this.socket = socket("ws://chat-gateway.veld.dev")
     this.logger = new loggers.Logger({ debug: options.debug, catch: false, colors: true, newLine: false, method: console.log })
 
     // Options
