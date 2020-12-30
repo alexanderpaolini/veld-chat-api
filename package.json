@@ -1,5 +1,5 @@
 {
-  "name": "veldchat.js",
+  "name": "veld-chat-api",
   "version": "0.0.1",
   "description": "A lib for chat.veld.dev",
   "main": "dist/index.js",
