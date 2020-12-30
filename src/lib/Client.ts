@@ -52,6 +52,18 @@ export class Client extends EventEmitter {
         this.users.set(member.id, member);
       })
     })
+    this.socket.on('user:join', (user: RawUser) => {
+      this.users.set(user.id, user);
+    });
+    this.socket.on('user:leave', (user: RawUser) => {
+      this.users.delete(user.id);
+    });
+    this.socket.on('channel:create', (channel: RawChannel) => {
+      this.channels.set(channel.id, new Channel(channel.id, this));
+    });
+    this.socket.on('channel:delete', (channel: RawChannel) => {
+      this.channels.delete(channel.id);
+    });
     this.socket.on('message:create', (message: RawMessage) => {
       this.emit('message', new Message(message, this))
     })
