@@ -17,6 +17,7 @@ class Client extends events_1.EventEmitter {
         // Logging and Connecting
         this.socket = socket_io_client_1.default("https://chat-gateway.veld.dev");
         this.logger = new loggers_1.default.Logger({ debug: options.debug, catch: false, colors: true, newLine: false, method: console.log });
+        this.restPint = 0;
         // Options
         this.token = token;
         this.debug = options.debug;
@@ -55,10 +56,13 @@ class Client extends events_1.EventEmitter {
     sendMessage(channelID, data) {
         if (typeof data == 'string')
             data = { content: data };
+        const ping = Date.now();
         node_fetch_1.default(`https://chat-gateway.veld.dev/api/v1/channels/${channelID}/messages`, {
             method: "POST",
             headers: { "content-type": "application/json", authorization: `Bearer ${this.token}` },
             body: JSON.stringify(data)
+        }).then(() => {
+            this.restPint = Date.now() - ping;
         });
         return true;
     }

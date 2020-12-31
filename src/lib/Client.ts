@@ -25,11 +25,13 @@ export class Client extends EventEmitter {
   private debug: boolean;
   channels: Map<string, Channel>;
   users: Map<string, RawUser>;
+  restPint: number
   constructor(token: string, options: ClientOptions) {
     super()
     // Logging and Connecting
     this.socket = io("https://chat-gateway.veld.dev")
     this.logger = new loggers.Logger({ debug: options.debug, catch: false, colors: true, newLine: false, method: console.log })
+    this.restPint = 0;
 
     // Options
     this.token = token;
@@ -71,10 +73,13 @@ export class Client extends EventEmitter {
 
   sendMessage(channelID: string, data: string | object) {
     if (typeof data == 'string') data = { content: data };
+    const ping = Date.now();
     fetch(`https://chat-gateway.veld.dev/api/v1/channels/${channelID}/messages`, {
       method: "POST",
       headers: { "content-type": "application/json", authorization: `Bearer ${this.token}` },
       body: JSON.stringify(data)
+    }).then(() => {
+      this.restPint = Date.now() - ping;
     })
     return true;
   }

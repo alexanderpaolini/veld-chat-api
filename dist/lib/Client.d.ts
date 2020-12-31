@@ -15,6 +15,7 @@ export declare class Client extends EventEmitter {
     private debug;
     channels: Map<string, Channel>;
     users: Map<string, RawUser>;
+    restPint: number;
     constructor(token: string, options: ClientOptions);
     sendMessage(channelID: string, data: string | object): boolean;
 }
