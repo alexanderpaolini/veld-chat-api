@@ -60,6 +60,9 @@ export class Client extends EventEmitter {
     this.socket.on('user:leave', (user: RawUser) => {
       this.users.delete(user.id);
     });
+    this.socket.on('user:update', (user: RawUser) => {
+      this.users.set(user.id, user);
+    });
     this.socket.on('channel:create', (channel: RawChannel) => {
       this.channels.set(channel.id, new Channel(channel, this));
     });
@@ -71,7 +74,7 @@ export class Client extends EventEmitter {
     })
   }
 
-  sendMessage(channelID: string, data: string | object) {
+  async sendMessage(channelID: string, data: string | object) {
     if (typeof data == 'string') data = { content: data };
     const ping = Date.now();
     fetch(`https://chat-gateway.veld.dev/api/v1/channels/${channelID}/messages`, {

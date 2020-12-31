@@ -1,6 +1,5 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.Embed = void 0;
 class Embed {
     constructor() {
         this.embed = {};

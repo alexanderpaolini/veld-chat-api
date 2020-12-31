@@ -1,9 +1,17 @@
 "use strict";
+var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, generator) {
+    function adopt(value) { return value instanceof P ? value : new P(function (resolve) { resolve(value); }); }
+    return new (P || (P = Promise))(function (resolve, reject) {
+        function fulfilled(value) { try { step(generator.next(value)); } catch (e) { reject(e); } }
+        function rejected(value) { try { step(generator["throw"](value)); } catch (e) { reject(e); } }
+        function step(result) { result.done ? resolve(result.value) : adopt(result.value).then(fulfilled, rejected); }
+        step((generator = generator.apply(thisArg, _arguments || [])).next());
+    });
+};
 var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.Client = void 0;
 const socket_io_client_1 = __importDefault(require("socket.io-client"));
 const node_fetch_1 = __importDefault(require("node-fetch"));
 const loggers_1 = __importDefault(require("loggers"));
@@ -43,6 +51,9 @@ class Client extends events_1.EventEmitter {
         this.socket.on('user:leave', (user) => {
             this.users.delete(user.id);
         });
+        this.socket.on('user:update', (user) => {
+            this.users.set(user.id, user);
+        });
         this.socket.on('channel:create', (channel) => {
             this.channels.set(channel.id, new Channel_1.Channel(channel, this));
         });
@@ -54,17 +65,19 @@ class Client extends events_1.EventEmitter {
         });
     }
     sendMessage(channelID, data) {
-        if (typeof data == 'string')
-            data = { content: data };
-        const ping = Date.now();
-        node_fetch_1.default(`https://chat-gateway.veld.dev/api/v1/channels/${channelID}/messages`, {
-            method: "POST",
-            headers: { "content-type": "application/json", authorization: `Bearer ${this.token}` },
-            body: JSON.stringify(data)
-        }).then(() => {
-            this.restPint = Date.now() - ping;
+        return __awaiter(this, void 0, void 0, function* () {
+            if (typeof data == 'string')
+                data = { content: data };
+            const ping = Date.now();
+            node_fetch_1.default(`https://chat-gateway.veld.dev/api/v1/channels/${channelID}/messages`, {
+                method: "POST",
+                headers: { "content-type": "application/json", authorization: `Bearer ${this.token}` },
+                body: JSON.stringify(data)
+            }).then(() => {
+                this.restPint = Date.now() - ping;
+            });
+            return true;
         });
-        return true;
     }
 }
 exports.Client = Client;

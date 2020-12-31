@@ -1,6 +1,5 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.Message = void 0;
 const Channel_1 = require("./Channel");
 class Message {
     constructor(data, client) {
