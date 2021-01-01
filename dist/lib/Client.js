@@ -46,8 +46,7 @@ class Client extends events_1.EventEmitter {
         this.token = token;
         if (this.isConnected)
             return;
-        const host = "api.veld.chat";
-        this.websocket = new ws_1.default(`wss://${host}`);
+        this.websocket = new ws_1.default(`wss://${this.options.host}`);
         this.websocket.on('open', () => {
             this.isConnected = true;
             this.websocket.send(JSON.stringify({
@@ -114,7 +113,7 @@ class Client extends events_1.EventEmitter {
     }
     _request(method, url, body) {
         return __awaiter(this, void 0, void 0, function* () {
-            return yield node_fetch_1.default('https://api.veld.chat/' + url, {
+            return yield node_fetch_1.default('https://' + this.options.host + '/' + url, {
                 method: method,
                 headers: { 'content-type': 'application/json', authorization: `Bearer ${this.token}` },
                 body: body ? JSON.stringify(body) : undefined

@@ -59,9 +59,7 @@ class Client extends EventEmitter {
     this.token = token;
     if (this.isConnected) return;
 
-    const host = "api.veld.chat";
-
-    this.websocket = new WebSocket(`wss://${host}`);
+    this.websocket = new WebSocket(`wss://${this.options.host}`);
 
     this.websocket.on('open', () => {
       this.isConnected = true;
@@ -131,7 +129,7 @@ class Client extends EventEmitter {
   }
 
   async _request(method: 'GET' | 'POST' | 'PATCH' | 'PUT' | 'DELETE', url: string, body: any) {
-    return await fetch('https://api.veld.chat/' + url, {
+    return await fetch('https://' + this.options.host + '/' + url, {
       method: method,
       headers: { 'content-type': 'application/json', authorization: `Bearer ${this.token}` },
       body: body ? JSON.stringify(body) : undefined
