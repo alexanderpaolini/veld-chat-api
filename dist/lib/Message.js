@@ -1,14 +1,17 @@
 "use strict";
+var __importDefault = (this && this.__importDefault) || function (mod) {
+    return (mod && mod.__esModule) ? mod : { "default": mod };
+};
 Object.defineProperty(exports, "__esModule", { value: true });
-const Channel_1 = require("./Channel");
+const User_1 = __importDefault(require("./User"));
 class Message {
     constructor(data, client) {
         this.id = data.id;
-        this.channel = new Channel_1.Channel(client.channels.get(data.channelId), client);
-        this.user = client.users.get(data.user);
         this.content = data.content;
-        this.client = client;
-        this.mentions = data.mentions;
+        this.embed = data.embed;
+        this.author = new User_1.default(data.author);
+        this.timestamp = new Date(data.timestamp);
+        this.channel = client.cache.channels[data.channelId];
     }
 }
-exports.Message = Message;
+exports.default = Message;

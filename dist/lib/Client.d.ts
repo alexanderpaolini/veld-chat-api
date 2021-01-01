@@ -1,22 +1,27 @@
-/// <reference types="socket.io-client" />
 /// <reference types="node" />
-import { Logger } from 'loggers';
 import { EventEmitter } from 'events';
-import { Channel } from './Channel';
-import RawUser from '../types/RawUser';
+import WebSocket from 'ws';
+import User from './User';
+interface ClientCache {
+    channels: object;
+    users: object;
+}
 interface ClientOptions {
-    debug: true;
-    name?: string;
+    heartbeatInterval: number;
+    host: string;
 }
-export declare class Client extends EventEmitter {
-    socket: SocketIOClient.Socket;
-    logger: Logger;
+declare class Client extends EventEmitter {
+    isConnected: boolean;
+    options: ClientOptions;
+    websocket: WebSocket;
+    cache: ClientCache;
     token: string;
-    private debug;
-    channels: Map<string, Channel>;
-    users: Map<string, RawUser>;
-    restPint: number;
-    constructor(token: string, options: ClientOptions);
-    sendMessage(channelID: string, data: string | object): Promise<boolean>;
+    user: User;
+    restPing: number;
+    constructor(options?: ClientOptions);
+    connect(token: string): void;
+    _request(method: 'GET' | 'POST' | 'PATCH' | 'PUT' | 'DELETE', url: string, body: any): Promise<import("node-fetch").Response>;
+    fetchUsers(channelID: string): Promise<any>;
+    sendMessage(channelID: string, data: string | object): Promise<import("node-fetch").Response>;
 }
-export {};
+export default Client;

@@ -2,7 +2,6 @@ declare type RawUser = {
     id: string;
     name: string;
     avatarUrl: string;
-    bot: boolean;
-    status: object;
+    isBot: boolean;
 };
 export default RawUser;

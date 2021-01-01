@@ -1,22 +1,31 @@
 import RawChannel from "../types/RawChannel";
+import RawMessage from "../types/RawMessage";
 import RawUser from "../types/RawUser";
-import { Client } from "./Client";
+import Client from "./Client";
 
-export class Channel {
+class Channel {
   id: string;
-  system: boolean;
   name: string;
-  members: RawUser[];
-  client: Client;
+  type: number;
+  members: RawUser[] | null;
+  messages: RawMessage[] | null;
+  private _client: Client;
   constructor(data: RawChannel, client: Client) {
     this.id = data.id;
-    this.system = data.system;
     this.name = data.name;
-    this.members = data.members
-    this.client = client;
+    this.type = data.type;
+    this.members = data.members;
+    this.messages = data.messages;
+    this._client = client;
   }
 
   async send (data: string | object) {
-    return this.client.sendMessage(this.id, data)
+    return await this._client.sendMessage(this.id, data);
+  }
+
+  async fetchUsers () {
+    return await this._client.fetchUsers(this.id);
   }
 }
+
+export default Channel;

@@ -1,13 +1,14 @@
-import RawMessage from '../types/RawMessage';
-import RawUser from '../types/RawUser';
-import { Channel } from './Channel';
-import { Client } from './Client';
-export declare class Message {
+import RawMessage from "../types/RawMessage";
+import Channel from "./Channel";
+import Client from "./Client";
+import User from "./User";
+declare class Message {
     id: string;
-    channel: Channel;
-    user: RawUser;
     content: string;
-    client: Client;
-    mentions: string[];
+    embed: string;
+    author: User;
+    timestamp: Date;
+    channel: Channel;
     constructor(data: RawMessage, client: Client);
 }
+export default Message;

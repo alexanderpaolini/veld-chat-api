@@ -1,89 +1,152 @@
-import io from "socket.io-client";
-import fetch from 'node-fetch';
-import loggers, { Logger } from 'loggers';
 import { EventEmitter } from 'events';
+import WebSocket from 'ws';
+import fetch, { Body } from 'node-fetch';
 
-// Classes
-import { Message } from './Message';
-import { Channel } from './Channel';
+import Channel from './Channel';
+import Message from './Message';
 
-// Types
-import RawChannel from '../types/RawChannel'
-import RawMessage from '../types/RawMessage'
-import RawUser from '../types/RawUser'
-import ReadyPayload from '../types/ReadyPayload'
+import User from './User';
 
-interface ClientOptions {
-  debug: true,
-  name?: string
+enum MessageType {
+  Authorize = 0,
+  Ready = 1,
+  MessageCreate = 2,
+  MessageUpdate = 3,
+  MessageDelete = 4,
+  UserUpdate = 8,
+  Heartbeat = 1000,
+  HeartbeatAck = 1001,
 }
 
-export class Client extends EventEmitter {
-  socket: SocketIOClient.Socket;
-  logger: Logger;
+interface WebSocketPayload {
+  t: MessageType;
+  d: any;
+}
+
+interface ClientCache {
+  channels: object;
+  users: object;
+}
+
+interface ClientOptions {
+  heartbeatInterval: number;
+  host: string;
+}
+
+class Client extends EventEmitter {
+  isConnected: boolean;
+  options: ClientOptions;
+  websocket: WebSocket;
+  cache: ClientCache;
   token: string;
-  private debug: boolean;
-  channels: Map<string, Channel>;
-  users: Map<string, RawUser>;
-  restPint: number
-  constructor(token: string, options: ClientOptions) {
-    super()
-    // Logging and Connecting
-    this.socket = io("https://chat-gateway.veld.dev")
-    this.logger = new loggers.Logger({ debug: options.debug, catch: false, colors: true, newLine: false, method: console.log })
-    this.restPint = 0;
+  user: User;
+  restPing: number;
 
-    // Options
+  constructor(options?: ClientOptions) {
+    super();
+    // Get the default options correct
+    this.options = Object.assign(options || {}, { host: 'api.veld.chat', heartbeatInterval: 15000 });
+    // Make sure it connects
+    this.isConnected = false;
+    // Define the cache (use FakeMap later for easier use)
+    this.cache = {
+      channels: {},
+      users: {}
+    };
+  }
+
+  connect(token: string) {
     this.token = token;
-    this.debug = options.debug;
+    if (this.isConnected) return;
 
-    // Caching?
-    this.channels = new Map();
-    this.users = new Map();
+    const host = "api.veld.chat";
 
-    this.socket.on("connect", () => {
-      this.logger.debug("Connected to socket.");
-      this.socket.emit("login", { token: token, bot: true });
+    this.websocket = new WebSocket(`wss://${host}`);
+
+    this.websocket.on('open', () => {
+      this.isConnected = true;
+      this.websocket.send(JSON.stringify({
+        t: MessageType.Authorize,
+        d: {
+          token: this.token,
+          bot: true,
+        }
+      }));
+      setInterval(() => {
+        if (!this.isConnected) return;
+        this.websocket.send(JSON.stringify({
+          t: MessageType.Heartbeat,
+          d: null,
+        }))
+      }, this.options.heartbeatInterval)
+    });
+
+    this.websocket.on('error', (err) => {
+      console.log("error", err);
+    });
+
+    this.websocket.on('close', (code, reason) => {
+      this.isConnected = false;
+      this.connect(this.token);
+    });
+
+    this.websocket.on('message', (data) => {
+      const payload = JSON.parse(data.toString()) as WebSocketPayload;
+      this.emit('raw', payload);
+      switch (payload.t) {
+        case MessageType.Authorize:
+          break;
+        case MessageType.Ready:
+          this.user = new User(payload.d.user);
+          payload.d.channels.forEach(channel => {
+            this.cache.channels[channel.id] = new Channel(channel, this);
+          });
+          this.cache.users[this.user.id] = this.user;
+          this.emit('ready', this.user);
+          this.fetchUsers('1')
+          // if(!this.user.bot) while (true) {};
+          break;
+        case MessageType.MessageCreate:
+          this.emit('message', new Message(payload.d, this));
+          break;
+        case MessageType.MessageUpdate:
+          break;
+        case MessageType.MessageDelete:
+          break;
+        case MessageType.UserUpdate:
+          const oldUser = this.cache.users[payload.d.id];
+          const newUser = new User(payload.d);
+          this.cache.users[newUser.id] = newUser;
+          this.emit('userUpdate', oldUser, newUser)
+          break;
+        case MessageType.Heartbeat:
+          this.emit('debug', '[Websocket] Sent Heartbeat')
+          break;
+        case MessageType.HeartbeatAck:
+          this.emit('debug', '[Websocket] HeartbeatAck?')
+          break;
+      }
+      return false;
     })
-    this.socket.on('ready', (data: ReadyPayload) => {
-      this.socket.emit("message:create", { content: "/nick " + options.name, channelId: data.mainChannel });
-      data.channels.forEach(channel => {
-        this.channels.set(channel.id, new Channel(channel, this));
-      })
-      data.members.forEach(member => {
-        this.users.set(member.id, member);
-      })
+  }
+
+  async _request(method: 'GET' | 'POST' | 'PATCH' | 'PUT' | 'DELETE', url: string, body: any) {
+    return await fetch('https://api.veld.chat/' + url, {
+      method: method,
+      headers: { 'content-type': 'application/json', authorization: `Bearer ${this.token}` },
+      body: body ? JSON.stringify(body) : undefined
     })
-    this.socket.on('user:join', (user: RawUser) => {
-      this.users.set(user.id, user);
-    });
-    this.socket.on('user:leave', (user: RawUser) => {
-      this.users.delete(user.id);
-    });
-    this.socket.on('user:update', (user: RawUser) => {
-      this.users.set(user.id, user);
-    });
-    this.socket.on('channel:create', (channel: RawChannel) => {
-      this.channels.set(channel.id, new Channel(channel, this));
-    });
-    this.socket.on('channel:delete', (channel: RawChannel) => {
-      this.channels.delete(channel.id);
-    });
-    this.socket.on('message:create', (message: RawMessage) => {
-      this.emit('message', new Message(message, this))
-    })
+  }
+
+  async fetchUsers(channelID: string) {
+    return await this._request('GET', `channels/${channelID}/members`, null).then(async req => await req.json())
   }
 
   async sendMessage(channelID: string, data: string | object) {
     if (typeof data == 'string') data = { content: data };
-    const ping = Date.now();
-    fetch(`https://chat-gateway.veld.dev/api/v1/channels/${channelID}/messages`, {
-      method: "POST",
-      headers: { "content-type": "application/json", authorization: `Bearer ${this.token}` },
-      body: JSON.stringify(data)
-    }).then(() => {
-      this.restPint = Date.now() - ping;
-    })
-    return true;
+    data['content'] = data['content'] || ''
+    return await this._request('POST', `channels/${channelID}/messages`, data);
   }
 }
+
+export default Client;

@@ -10,11 +10,13 @@
     "@types/socket.io-client": "^1.4.34",
     "loggers": "github:million900o/loggers",
     "node-fetch": "^2.6.1",
-    "socket.io-client": "^2.3.1"
+    "socket.io-client": "^2.3.1",
+    "ws": "^7.4.2"
   },
   "description": "A lib for chat.veld.dev",
   "devDependencies": {
     "@types/node-fetch": "^2.5.7",
+    "@types/ws": "^7.4.0",
     "typescript": "^4.1.3"
   },
   "homepage": "https://github.com/Million900o/veldchat.js#readme",
