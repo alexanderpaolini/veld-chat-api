@@ -6,6 +6,7 @@ import Channel from './Channel';
 import Message from './Message';
 
 import User from './User';
+import RawChannel from '../types/RawChannel';
 
 enum MessageType {
   Authorize = 0,
@@ -96,7 +97,7 @@ class Client extends EventEmitter {
           break;
         case MessageType.Ready:
           this.user = new User(payload.d.user);
-          payload.d.channels.forEach(channel => {
+          payload.d.channels.forEach((channel: RawChannel) => {
             this.cache.channels[channel.id] = new Channel(channel, this);
           });
           this.cache.users[this.user.id] = this.user;

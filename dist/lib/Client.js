@@ -80,7 +80,7 @@ class Client extends events_1.EventEmitter {
                     break;
                 case MessageType.Ready:
                     this.user = new User_1.default(payload.d.user);
-                    payload.d.channels.forEach(channel => {
+                    payload.d.channels.forEach((channel) => {
                         this.cache.channels[channel.id] = new Channel_1.default(channel, this);
                     });
                     this.cache.users[this.user.id] = this.user;
