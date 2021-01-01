@@ -101,7 +101,6 @@ class Client extends EventEmitter {
           });
           this.cache.users[this.user.id] = this.user;
           this.emit('ready', this.user);
-          this.fetchUsers('1')
           // if(!this.user.bot) while (true) {};
           break;
         case MessageType.MessageCreate:
