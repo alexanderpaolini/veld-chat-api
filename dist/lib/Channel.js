@@ -28,5 +28,10 @@ class Channel {
             return yield this._client.fetchUsers(this.id);
         });
     }
+    join() {
+        return __awaiter(this, void 0, void 0, function* () {
+            return yield this._client.joinChannel(this.name);
+        });
+    }
 }
 exports.default = Channel;

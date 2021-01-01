@@ -26,6 +26,10 @@ class Channel {
   async fetchUsers () {
     return await this._client.fetchUsers(this.id);
   }
+
+  async join() {
+    return await this._client.joinChannel(this.name);
+  }
 }
 
 export default Channel;

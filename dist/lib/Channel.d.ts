@@ -12,5 +12,6 @@ declare class Channel {
     constructor(data: RawChannel, client: Client);
     send(data: string | object): Promise<any>;
     fetchUsers(): Promise<any>;
+    join(): Promise<any>;
 }
 export default Channel;
