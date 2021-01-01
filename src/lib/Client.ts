@@ -142,7 +142,6 @@ class Client extends EventEmitter {
 
   async sendMessage(channelID: string, data: string | object) {
     if (typeof data == 'string') data = { content: data };
-    data['content'] = data['content'] || ''
     return await this._request('POST', `channels/${channelID}/messages`, data).then(async req => await req.json());
   }
 }

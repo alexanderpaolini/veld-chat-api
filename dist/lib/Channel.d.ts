@@ -10,7 +10,7 @@ declare class Channel {
     messages: RawMessage[] | null;
     private _client;
     constructor(data: RawChannel, client: Client);
-    send(data: string | object): Promise<import("node-fetch").Response>;
+    send(data: string | object): Promise<any>;
     fetchUsers(): Promise<any>;
 }
 export default Channel;

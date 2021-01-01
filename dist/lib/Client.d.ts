@@ -22,6 +22,6 @@ declare class Client extends EventEmitter {
     connect(token: string): void;
     _request(method: 'GET' | 'POST' | 'PATCH' | 'PUT' | 'DELETE', url: string, body: any): Promise<import("node-fetch").Response>;
     fetchUsers(channelID: string): Promise<any>;
-    sendMessage(channelID: string, data: string | object): Promise<import("node-fetch").Response>;
+    sendMessage(channelID: string, data: string | object): Promise<any>;
 }
 export default Client;

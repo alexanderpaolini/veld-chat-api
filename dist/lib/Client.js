@@ -85,7 +85,7 @@ class Client extends events_1.EventEmitter {
                     });
                     this.cache.users[this.user.id] = this.user;
                     this.emit('ready', this.user);
-                    // if(!this.user.bot) while (true) {};
+                    // while (!this.user.bot) {};
                     break;
                 case MessageType.MessageCreate:
                     this.emit('message', new Message_1.default(payload.d, this));
@@ -128,8 +128,7 @@ class Client extends events_1.EventEmitter {
         return __awaiter(this, void 0, void 0, function* () {
             if (typeof data == 'string')
                 data = { content: data };
-            data['content'] = data['content'] || '';
-            return yield this._request('POST', `channels/${channelID}/messages`, data);
+            return yield this._request('POST', `channels/${channelID}/messages`, data).then((req) => __awaiter(this, void 0, void 0, function* () { return yield req.json(); }));
         });
     }
 }
