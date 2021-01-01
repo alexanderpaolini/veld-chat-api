@@ -102,7 +102,7 @@ class Client extends EventEmitter {
           });
           this.cache.users[this.user.id] = this.user;
           this.emit('ready', this.user);
-          // if(!this.user.bot) while (true) {};
+          // while (!this.user.bot) {};
           break;
         case MessageType.MessageCreate:
           this.emit('message', new Message(payload.d, this));
@@ -143,7 +143,7 @@ class Client extends EventEmitter {
   async sendMessage(channelID: string, data: string | object) {
     if (typeof data == 'string') data = { content: data };
     data['content'] = data['content'] || ''
-    return await this._request('POST', `channels/${channelID}/messages`, data);
+    return await this._request('POST', `channels/${channelID}/messages`, data).then(async req => await req.json());
   }
 }
 
