@@ -131,5 +131,12 @@ class Client extends events_1.EventEmitter {
             return yield this._request('POST', `channels/${channelID}/messages`, data).then((req) => __awaiter(this, void 0, void 0, function* () { return yield req.json(); }));
         });
     }
+    // channelID soon™️ - Veld
+    joinChannel(channelName) {
+        return __awaiter(this, void 0, void 0, function* () {
+            const body = { channel: channelName };
+            return yield this._request('POST', 'channels/join', body);
+        });
+    }
 }
 exports.default = Client;

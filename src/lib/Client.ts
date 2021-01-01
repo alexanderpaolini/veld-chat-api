@@ -128,7 +128,7 @@ class Client extends EventEmitter {
     })
   }
 
-  async _request(method: 'GET' | 'POST' | 'PATCH' | 'PUT' | 'DELETE', url: string, body: any) {
+  private async _request(method: 'GET' | 'POST' | 'PATCH' | 'PUT' | 'DELETE', url: string, body: any) {
     return await fetch('https://' + this.options.host + '/' + url, {
       method: method,
       headers: { 'content-type': 'application/json', authorization: `Bearer ${this.token}` },
@@ -140,10 +140,17 @@ class Client extends EventEmitter {
     return await this._request('GET', `channels/${channelID}/members`, null).then(async req => await req.json())
   }
 
-  async sendMessage(channelID: string, data: string | object) {
+  async sendMessage(channelID: string, data: string | object): Promise<any> {
     if (typeof data == 'string') data = { content: data };
     return await this._request('POST', `channels/${channelID}/messages`, data).then(async req => await req.json());
   }
+
+  // channelID soon™️ - Veld
+  async joinChannel(channelName: string): Promise<any> {
+    const body = { channel: channelName };
+    return await this._request('POST', 'channels/join', body);
+  }
+
 }
 
 export default Client;

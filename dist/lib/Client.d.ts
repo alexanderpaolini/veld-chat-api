@@ -20,8 +20,9 @@ declare class Client extends EventEmitter {
     restPing: number;
     constructor(options?: ClientOptions);
     connect(token: string): void;
-    _request(method: 'GET' | 'POST' | 'PATCH' | 'PUT' | 'DELETE', url: string, body: any): Promise<import("node-fetch").Response>;
+    private _request;
     fetchUsers(channelID: string): Promise<any>;
     sendMessage(channelID: string, data: string | object): Promise<any>;
+    joinChannel(channelName: string): Promise<any>;
 }
 export default Client;
