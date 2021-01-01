@@ -45,4 +45,4 @@ class Embed {
         };
     }
 }
-exports.Embed = Embed;
+exports.default = Embed;

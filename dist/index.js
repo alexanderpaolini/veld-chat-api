@@ -11,3 +11,5 @@ const Message_1 = __importDefault(require("./lib/Message"));
 exports.Message = Message_1.default;
 const User_1 = __importDefault(require("./lib/User"));
 exports.User = User_1.default;
+const Embed_1 = __importDefault(require("./lib/Embed"));
+exports.Embed = Embed_1.default;

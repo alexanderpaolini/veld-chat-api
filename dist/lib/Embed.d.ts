@@ -2,7 +2,7 @@ declare type EmbedAuthor = {
     value: string;
     iconUrl: string;
 };
-export declare class Embed {
+declare class Embed {
     embed: {
         author?: EmbedAuthor;
         title?: string;
@@ -33,4 +33,4 @@ export declare class Embed {
         };
     };
 }
-export {};
+export default Embed;
