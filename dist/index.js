@@ -1,7 +1,13 @@
-const { Embed } = require('./lib/Embed');
-module.exports = {
-    Client: require('./lib/Client').Client,
-    Message: require('./lib/Message').Message,
-    Channel: require('./lib/Channel').Channel,
-    Embed: require('./lib/Embed').Embed
+"use strict";
+var __importDefault = (this && this.__importDefault) || function (mod) {
+    return (mod && mod.__esModule) ? mod : { "default": mod };
 };
+Object.defineProperty(exports, "__esModule", { value: true });
+const Channel_1 = __importDefault(require("./lib/Channel"));
+exports.Channel = Channel_1.default;
+const Client_1 = __importDefault(require("./lib/Client"));
+exports.Client = Client_1.default;
+const Message_1 = __importDefault(require("./lib/Message"));
+exports.Message = Message_1.default;
+const User_1 = __importDefault(require("./lib/User"));
+exports.User = User_1.default;

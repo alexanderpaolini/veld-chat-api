@@ -1,8 +1,10 @@
-import RawUser from './RawUser';
+import RawMessage from "./RawMessage";
+import RawUser from "./RawUser";
 declare type RawChannel = {
     id: string;
-    system: boolean;
     name: string;
-    members: RawUser[];
+    type: null;
+    members: RawUser[] | null;
+    messages: RawMessage[] | null;
 };
 export default RawChannel;

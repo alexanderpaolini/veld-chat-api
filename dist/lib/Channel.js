@@ -12,15 +12,21 @@ Object.defineProperty(exports, "__esModule", { value: true });
 class Channel {
     constructor(data, client) {
         this.id = data.id;
-        this.system = data.system;
         this.name = data.name;
+        this.type = data.type;
         this.members = data.members;
-        this.client = client;
+        this.messages = data.messages;
+        this._client = client;
     }
     send(data) {
         return __awaiter(this, void 0, void 0, function* () {
-            return this.client.sendMessage(this.id, data);
+            return yield this._client.sendMessage(this.id, data);
+        });
+    }
+    fetchUsers() {
+        return __awaiter(this, void 0, void 0, function* () {
+            return yield this._client.fetchUsers(this.id);
         });
     }
 }
-exports.Channel = Channel;
+exports.default = Channel;

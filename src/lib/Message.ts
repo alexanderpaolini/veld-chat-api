@@ -1,21 +1,23 @@
-import RawMessage from '../types/RawMessage';
-import RawUser from '../types/RawUser';
-import { Channel } from './Channel';
-import { Client } from './Client';
+import RawMessage from "../types/RawMessage";
+import Channel from "./Channel";
+import Client from "./Client";
+import User from "./User";
 
-export class Message {
+class Message {
   id: string;
-  channel: Channel;
-  user: RawUser;
   content: string;
-  client: Client;
-  mentions: string[];
+  embed: string;
+  author: User;
+  timestamp: Date;
+  channel: Channel;
   constructor(data: RawMessage, client: Client) {
     this.id = data.id;
-    this.channel = new Channel(client.channels.get(data.channelId), client);
-    this.user = client.users.get(data.user);
     this.content = data.content;
-    this.client = client;
-    this.mentions = data.mentions;
+    this.embed = data.embed;
+    this.author = new User(data.author);
+    this.timestamp = new Date(data.timestamp);
+    this.channel = client.cache.channels[data.channelId];
   }
 }
+
+export default Message;

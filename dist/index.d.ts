@@ -1,4 +1,5 @@
-export declare const Client: typeof import("./lib/Client").Client;
-export declare const Message: typeof import("./lib/Message").Message;
-export declare const Channel: typeof import("./lib/Channel").Channel;
-export declare const Embed: typeof import("./lib/Embed").Embed;
+import Channel from "./lib/Channel";
+import Client from "./lib/Client";
+import Message from "./lib/Message";
+import User from "./lib/User";
+export { Channel, Client, Message, User };
