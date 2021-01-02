@@ -17,6 +17,7 @@ enum MessageType {
   UserUpdate = 8,
   Heartbeat = 1000,
   HeartbeatAck = 1001,
+  Close = 1006,
 }
 
 interface WebSocketPayload {
