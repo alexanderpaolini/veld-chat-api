@@ -1,2 +1,2 @@
 # veld-chat-api
-Some lib for veld's chat
+A library used for interaction with the Veld.Chat API.
