@@ -41,6 +41,7 @@ class Client extends events_1.EventEmitter {
             channels: {},
             users: {}
         };
+        this.connection = 0;
     }
     connect(token) {
         this.token = token;
@@ -69,8 +70,12 @@ class Client extends events_1.EventEmitter {
             console.log("error", err);
         });
         this.websocket.on('close', (code, reason) => {
+            this.connection++;
             this.isConnected = false;
-            this.connect(this.token);
+            if (this.connection < 10)
+                this.connect(this.token);
+            else
+                throw new Error('Exceeded maximum login attempts (10)');
         });
         this.websocket.on('message', (data) => {
             const payload = JSON.parse(data.toString());
@@ -79,6 +84,7 @@ class Client extends events_1.EventEmitter {
                 case MessageType.Authorize:
                     break;
                 case MessageType.Ready:
+                    this.connection = 0;
                     this.user = new User_1.default(payload.d.user);
                     payload.d.channels.forEach((channel) => {
                         this.cache.channels[channel.id] = new Channel_1.default(channel, this);

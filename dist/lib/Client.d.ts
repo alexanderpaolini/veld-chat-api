@@ -11,6 +11,7 @@ interface ClientOptions {
     host: string;
 }
 declare class Client extends EventEmitter {
+    connection: number;
     isConnected: boolean;
     options: ClientOptions;
     websocket: WebSocket;

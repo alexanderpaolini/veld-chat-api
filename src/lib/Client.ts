@@ -35,6 +35,7 @@ interface ClientOptions {
 }
 
 class Client extends EventEmitter {
+  connection: number;
   isConnected: boolean;
   options: ClientOptions;
   websocket: WebSocket;
@@ -54,6 +55,7 @@ class Client extends EventEmitter {
       channels: {},
       users: {}
     };
+    this.connection = 0;
   }
 
   connect(token: string) {
@@ -85,8 +87,10 @@ class Client extends EventEmitter {
     });
 
     this.websocket.on('close', (code, reason) => {
+      this.connection++
       this.isConnected = false;
-      this.connect(this.token);
+      if (this.connection < 10) this.connect(this.token);
+      else throw new Error('Exceeded maximum login attempts (10)')
     });
 
     this.websocket.on('message', (data) => {
@@ -96,6 +100,7 @@ class Client extends EventEmitter {
         case MessageType.Authorize:
           break;
         case MessageType.Ready:
+          this.connection = 0;
           this.user = new User(payload.d.user);
           payload.d.channels.forEach((channel: RawChannel) => {
             this.cache.channels[channel.id] = new Channel(channel, this);
