@@ -17,7 +17,6 @@ enum MessageType {
   UserUpdate = 8,
   Heartbeat = 1000,
   HeartbeatAck = 1001,
-  Close = 1006,
 }
 
 interface WebSocketPayload {
@@ -88,10 +87,8 @@ class Client extends EventEmitter {
     });
 
     this.websocket.on('close', (code, reason) => {
-      this.connection++
       this.isConnected = false;
-      if (this.connection < 10) this.connect(this.token);
-      else throw new Error('Exceeded maximum login attempts (10)')
+      throw new Error('Token is incorrect.');
     });
 
     this.websocket.on('message', (data) => {
