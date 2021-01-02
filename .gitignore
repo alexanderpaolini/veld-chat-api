@@ -105,3 +105,6 @@ typings/
 
 # Test folder
 test/
+
+# package lock
+package-lock.json
