@@ -46,11 +46,8 @@ class Client extends EventEmitter {
 
   constructor(options?: ClientOptions) {
     super();
-    // Get the default options correct
     this.options = Object.assign(options || {}, { host: 'api.veld.chat', heartbeatInterval: 15000 });
-    // Make sure it connects
     this.isConnected = false;
-    // Define the cache (use FakeMap later for easier use)
     this.cache = {
       channels: {},
       users: {}
