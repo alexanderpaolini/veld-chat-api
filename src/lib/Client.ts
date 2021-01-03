@@ -1,6 +1,6 @@
 import { EventEmitter } from 'events';
 import WebSocket from 'ws';
-import fetch, { Body } from 'node-fetch';
+import fetch from 'node-fetch';
 
 import Channel from './Channel';
 import Message from './Message';
@@ -8,7 +8,6 @@ import Message from './Message';
 import User from './User';
 import RawChannel from '../types/RawChannel';
 import RawUser from '../types/RawUser';
-import { pathToFileURL } from 'url';
 
 enum MessageType {
   Authorize = 0,
