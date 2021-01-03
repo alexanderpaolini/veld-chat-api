@@ -41,7 +41,6 @@ class Client extends events_1.EventEmitter {
             channels: {},
             users: {}
         };
-        this.connection = 0;
     }
     connect(token) {
         this.token = token;
@@ -69,7 +68,7 @@ class Client extends events_1.EventEmitter {
         this.websocket.on('error', (err) => {
             console.log("error", err);
         });
-        this.websocket.on('close', (code, reason) => {
+        this.websocket.on('close', () => {
             this.isConnected = false;
             throw new Error('Token is incorrect.');
         });
@@ -77,10 +76,11 @@ class Client extends events_1.EventEmitter {
             const payload = JSON.parse(data.toString());
             this.emit('raw', payload);
             switch (payload.t) {
+                // Authorize is 0
                 case MessageType.Authorize:
                     break;
+                // Ready is 1
                 case MessageType.Ready:
-                    this.connection = 0;
                     this.user = new User_1.default(payload.d.user);
                     payload.d.channels.forEach((channel) => {
                         this.cache.channels[channel.id] = new Channel_1.default(channel, this);
@@ -94,29 +94,38 @@ class Client extends events_1.EventEmitter {
                     });
                     // while (!this.user.bot) {};
                     break;
+                // MessageCreate is 2
                 case MessageType.MessageCreate:
                     this.cache.users[payload.d.author.id] = new User_1.default(payload.d.author);
                     this.emit('message', new Message_1.default(payload.d, this));
                     break;
+                // Message Update is 3
                 case MessageType.MessageUpdate:
                     break;
+                // Message Delete is 4
                 case MessageType.MessageDelete:
                     break;
+                // User Update is 8
                 case MessageType.UserUpdate:
                     const oldUser = this.cache.users[payload.d.id];
                     const newUser = new User_1.default(payload.d);
                     this.cache.users[newUser.id] = newUser;
                     this.emit('userUpdate', oldUser, newUser);
                     break;
+                // Member Create is 9
                 case MessageType.MemberCreate:
                     break;
+                // Member Delete is 11
                 case MessageType.MemberDelete:
                     break;
+                // Presense Update is 12
                 case MessageType.PresenceUpdate:
                     break;
+                // Heartbeat is 1000
                 case MessageType.Heartbeat:
                     this.emit('debug', '[Websocket] Sent Heartbeat');
                     break;
+                // HeartbeatAck is 1001
                 case MessageType.HeartbeatAck:
                     this.emit('debug', '[Websocket] HeartbeatAck?');
                     break;
