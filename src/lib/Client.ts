@@ -57,7 +57,6 @@ class Client extends EventEmitter {
       channels: {},
       users: {}
     };
-    this.connection = 0;
   }
 
   connect(token: string) {
@@ -88,7 +87,7 @@ class Client extends EventEmitter {
       console.log("error", err);
     });
 
-    this.websocket.on('close', (code, reason) => {
+    this.websocket.on('close', () => {
       this.isConnected = false;
       throw new Error('Token is incorrect.');
     });
@@ -103,7 +102,6 @@ class Client extends EventEmitter {
 
         // Ready is 1
         case MessageType.Ready:
-          this.connection = 0;
           this.user = new User(payload.d.user);
           payload.d.channels.forEach((channel: RawChannel) => {
             this.cache.channels[channel.id] = new Channel(channel, this);
