@@ -7,6 +7,8 @@ import Message from './Message';
 
 import User from './User';
 import RawChannel from '../types/RawChannel';
+import RawUser from '../types/RawUser';
+import { pathToFileURL } from 'url';
 
 enum MessageType {
   Authorize = 0,
@@ -15,6 +17,9 @@ enum MessageType {
   MessageUpdate = 3,
   MessageDelete = 4,
   UserUpdate = 8,
+  MemberCreate = 9,
+  MemberDelete = 11,
+  PresenceUpdate = 12,
   Heartbeat = 1000,
   HeartbeatAck = 1001,
 }
@@ -92,8 +97,11 @@ class Client extends EventEmitter {
       const payload = JSON.parse(data.toString()) as WebSocketPayload;
       this.emit('raw', payload);
       switch (payload.t) {
+        // Authorize is 0
         case MessageType.Authorize:
           break;
+
+        // Ready is 1
         case MessageType.Ready:
           this.connection = 0;
           this.user = new User(payload.d.user);
@@ -102,27 +110,58 @@ class Client extends EventEmitter {
           });
           this.cache.users[this.user.id] = this.user;
           this.emit('ready', this.user);
+          this.fetchUsers('1').then((users: RawUser[]) => {
+            users.forEach((user: RawUser) => {
+              this.cache.users[user.id] = new User(user);
+            })
+          })
           // while (!this.user.bot) {};
           break;
+
+        // MessageCreate is 2
         case MessageType.MessageCreate:
+          this.cache.users[payload.d.author.id] = new User(payload.d.author)
           this.emit('message', new Message(payload.d, this));
           break;
+
+        // Message Update is 3
         case MessageType.MessageUpdate:
           break;
+
+        // Message Delete is 4
         case MessageType.MessageDelete:
           break;
+
+        // User Update is 8
         case MessageType.UserUpdate:
           const oldUser = this.cache.users[payload.d.id];
           const newUser = new User(payload.d);
           this.cache.users[newUser.id] = newUser;
           this.emit('userUpdate', oldUser, newUser)
           break;
+
+        // Member Create is 9
+        case MessageType.MemberCreate:
+          break;
+
+        // Member Delete is 11
+        case MessageType.MemberDelete:
+          break;
+
+        // Presense Update is 12
+        case MessageType.PresenceUpdate:
+          break;
+
+        // Heartbeat is 1000
         case MessageType.Heartbeat:
           this.emit('debug', '[Websocket] Sent Heartbeat')
           break;
+
+        // HeartbeatAck is 1001
         case MessageType.HeartbeatAck:
           this.emit('debug', '[Websocket] HeartbeatAck?')
           break;
+
       }
       return false;
     })

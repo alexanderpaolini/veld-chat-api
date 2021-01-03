@@ -26,17 +26,17 @@ var MessageType;
     MessageType[MessageType["MessageUpdate"] = 3] = "MessageUpdate";
     MessageType[MessageType["MessageDelete"] = 4] = "MessageDelete";
     MessageType[MessageType["UserUpdate"] = 8] = "UserUpdate";
+    MessageType[MessageType["MemberCreate"] = 9] = "MemberCreate";
+    MessageType[MessageType["MemberDelete"] = 11] = "MemberDelete";
+    MessageType[MessageType["PresenceUpdate"] = 12] = "PresenceUpdate";
     MessageType[MessageType["Heartbeat"] = 1000] = "Heartbeat";
     MessageType[MessageType["HeartbeatAck"] = 1001] = "HeartbeatAck";
 })(MessageType || (MessageType = {}));
 class Client extends events_1.EventEmitter {
     constructor(options) {
         super();
-        // Get the default options correct
         this.options = Object.assign(options || {}, { host: 'api.veld.chat', heartbeatInterval: 15000 });
-        // Make sure it connects
         this.isConnected = false;
-        // Define the cache (use FakeMap later for easier use)
         this.cache = {
             channels: {},
             users: {}
@@ -70,12 +70,8 @@ class Client extends events_1.EventEmitter {
             console.log("error", err);
         });
         this.websocket.on('close', (code, reason) => {
-            this.connection++;
             this.isConnected = false;
-            if (this.connection < 10)
-                this.connect(this.token);
-            else
-                throw new Error('Exceeded maximum login attempts (10)');
+            throw new Error('Token is incorrect.');
         });
         this.websocket.on('message', (data) => {
             const payload = JSON.parse(data.toString());
@@ -91,9 +87,15 @@ class Client extends events_1.EventEmitter {
                     });
                     this.cache.users[this.user.id] = this.user;
                     this.emit('ready', this.user);
+                    this.fetchUsers('1').then((users) => {
+                        users.forEach((user) => {
+                            this.cache.users[user.id] = new User_1.default(user);
+                        });
+                    });
                     // while (!this.user.bot) {};
                     break;
                 case MessageType.MessageCreate:
+                    this.cache.users[payload.d.author.id] = new User_1.default(payload.d.author);
                     this.emit('message', new Message_1.default(payload.d, this));
                     break;
                 case MessageType.MessageUpdate:
@@ -105,6 +107,12 @@ class Client extends events_1.EventEmitter {
                     const newUser = new User_1.default(payload.d);
                     this.cache.users[newUser.id] = newUser;
                     this.emit('userUpdate', oldUser, newUser);
+                    break;
+                case MessageType.MemberCreate:
+                    break;
+                case MessageType.MemberDelete:
+                    break;
+                case MessageType.PresenceUpdate:
                     break;
                 case MessageType.Heartbeat:
                     this.emit('debug', '[Websocket] Sent Heartbeat');
