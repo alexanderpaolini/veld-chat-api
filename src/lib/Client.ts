@@ -122,7 +122,7 @@ class Client extends EventEmitter {
 
         // MessageCreate is 2
         case MessageType.MessageCreate:
-          this.cache.users.set(payload.d.author.i, new User(payload.d.author));
+          this.cache.users.set(payload.d.author.id, new User(payload.d.author));
           this.emit('message', new Message(payload.d, this));
           break;
 
