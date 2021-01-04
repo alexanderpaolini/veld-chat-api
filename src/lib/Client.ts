@@ -45,9 +45,9 @@ class Client extends EventEmitter {
   options: ClientOptions;
   websocket: WebSocket;
   cache: ClientCache;
-  token: string;
   user: User;
   restPing: number;
+  private token: string;
 
   constructor(options?: ClientOptions) {
     super();
