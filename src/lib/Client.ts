@@ -156,7 +156,7 @@ class Client extends EventEmitter {
             // Online is 0
             case StatusType.Online:
               const onlineUser = new User(payload.d.user)
-              this.cache.users.set(newUser.id, newUser);
+              this.cache.users.set(onlineUser.id, onlineUser);
               this.emit('statusUpdate', { text: payload.d.statusText, type: payload.d.statusType }, onlineUser, null)
               break;
 
