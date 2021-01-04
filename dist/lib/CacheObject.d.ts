@@ -3,6 +3,7 @@ export default class CacheObject extends Object {
     get(key: string): any;
     set(key: string, value: any): this;
     delete(key: string): this;
+    clear(): this;
     toString(): string;
     values(): any[];
     keys(): string[];

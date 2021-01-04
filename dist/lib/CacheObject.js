@@ -16,6 +16,12 @@ class CacheObject extends Object {
         delete this[key];
         return this;
     }
+    clear() {
+        this.keys().forEach(key => {
+            delete this[key];
+        });
+        return this;
+    }
     toString() {
         return JSON.stringify(this);
     }
