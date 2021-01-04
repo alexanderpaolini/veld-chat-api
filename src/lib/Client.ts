@@ -8,6 +8,7 @@ import Message from './Message';
 import User from './User';
 import RawChannel from '../types/RawChannel';
 import RawUser from '../types/RawUser';
+import CacheObject from './CacheObject';
 
 enum MessageType {
   Authorize = 0,
@@ -29,8 +30,8 @@ interface WebSocketPayload {
 }
 
 interface ClientCache {
-  channels: object;
-  users: object;
+  channels: CacheObject;
+  users: CacheObject;
 }
 
 interface ClientOptions {
@@ -53,8 +54,8 @@ class Client extends EventEmitter {
     this.options = Object.assign(options || {}, { host: 'api.veld.chat', heartbeatInterval: 15000 });
     this.isConnected = false;
     this.cache = {
-      channels: {},
-      users: {}
+      channels: new CacheObject(),
+      users: new CacheObject()
     };
   }
 
@@ -103,13 +104,12 @@ class Client extends EventEmitter {
         case MessageType.Ready:
           this.user = new User(payload.d.user);
           payload.d.channels.forEach((channel: RawChannel) => {
-            this.cache.channels[channel.id] = new Channel(channel, this);
+            this.cache.channels.set(channel.id, new Channel(channel, this));
           });
-          this.cache.users[this.user.id] = this.user;
           this.emit('ready', this.user);
           this.fetchUsers('1').then((users: RawUser[]) => {
             users.forEach((user: RawUser) => {
-              this.cache.users[user.id] = new User(user);
+              this.cache.users.set(user.id, new User(user));
             })
           })
           // while (!this.user.bot) {};
@@ -117,7 +117,7 @@ class Client extends EventEmitter {
 
         // MessageCreate is 2
         case MessageType.MessageCreate:
-          this.cache.users[payload.d.author.id] = new User(payload.d.author)
+          this.cache.users.set(payload.d.author.i, new User(payload.d.author));
           this.emit('message', new Message(payload.d, this));
           break;
 
@@ -131,9 +131,9 @@ class Client extends EventEmitter {
 
         // User Update is 8
         case MessageType.UserUpdate:
-          const oldUser = this.cache.users[payload.d.id];
+          const oldUser = this.cache.users.get(payload.d.id);
           const newUser = new User(payload.d);
-          this.cache.users[newUser.id] = newUser;
+          this.cache.users.set(newUser.id, newUser);
           this.emit('userUpdate', oldUser, newUser)
           break;
 
