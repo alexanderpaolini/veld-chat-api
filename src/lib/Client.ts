@@ -24,6 +24,11 @@ enum MessageType {
   HeartbeatAck = 1001,
 }
 
+enum StatusType {
+  Online = 0,
+  Offline = 1
+}
+
 interface WebSocketPayload {
   t: MessageType;
   d: any;
@@ -147,6 +152,21 @@ class Client extends EventEmitter {
 
         // Presense Update is 12
         case MessageType.PresenceUpdate:
+          switch (payload.d.statusType) {
+            // Online is 0
+            case StatusType.Online:
+              const onlineUser = new User(payload.d.user)
+              this.cache.users.set(newUser.id, newUser);
+              this.emit('statusUpdate', { text: payload.d.statusText, type: payload.d.statusType }, onlineUser, null)
+              break;
+
+            // Offline is 1
+            case StatusType.Offline:
+              const offlineUser = this.cache.users.get(payload.d.user.id);
+              this.cache.users.delete(payload.d.user.id);
+              this.emit('statusUpdate', { text: payload.d.statusText, type: payload.d.statusType }, null, offlineUser);
+              break;
+          }
           break;
 
         // Heartbeat is 1000
