@@ -2,9 +2,10 @@
 import { EventEmitter } from 'events';
 import WebSocket from 'ws';
 import User from './User';
+import CacheObject from './CacheObject';
 interface ClientCache {
-    channels: object;
-    users: object;
+    channels: CacheObject;
+    users: CacheObject;
 }
 interface ClientOptions {
     heartbeatInterval: number;

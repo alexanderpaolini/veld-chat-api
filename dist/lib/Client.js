@@ -18,6 +18,7 @@ const node_fetch_1 = __importDefault(require("node-fetch"));
 const Channel_1 = __importDefault(require("./Channel"));
 const Message_1 = __importDefault(require("./Message"));
 const User_1 = __importDefault(require("./User"));
+const CacheObject_1 = __importDefault(require("./CacheObject"));
 var MessageType;
 (function (MessageType) {
     MessageType[MessageType["Authorize"] = 0] = "Authorize";
@@ -38,8 +39,8 @@ class Client extends events_1.EventEmitter {
         this.options = Object.assign(options || {}, { host: 'api.veld.chat', heartbeatInterval: 15000 });
         this.isConnected = false;
         this.cache = {
-            channels: {},
-            users: {}
+            channels: new CacheObject_1.default(),
+            users: new CacheObject_1.default()
         };
     }
     connect(token) {
@@ -83,20 +84,19 @@ class Client extends events_1.EventEmitter {
                 case MessageType.Ready:
                     this.user = new User_1.default(payload.d.user);
                     payload.d.channels.forEach((channel) => {
-                        this.cache.channels[channel.id] = new Channel_1.default(channel, this);
+                        this.cache.channels.set(channel.id, new Channel_1.default(channel, this));
                     });
-                    this.cache.users[this.user.id] = this.user;
                     this.emit('ready', this.user);
                     this.fetchUsers('1').then((users) => {
                         users.forEach((user) => {
-                            this.cache.users[user.id] = new User_1.default(user);
+                            this.cache.users.set(user.id, new User_1.default(user));
                         });
                     });
                     // while (!this.user.bot) {};
                     break;
                 // MessageCreate is 2
                 case MessageType.MessageCreate:
-                    this.cache.users[payload.d.author.id] = new User_1.default(payload.d.author);
+                    this.cache.users.set(payload.d.author.i, new User_1.default(payload.d.author));
                     this.emit('message', new Message_1.default(payload.d, this));
                     break;
                 // Message Update is 3
@@ -107,9 +107,9 @@ class Client extends events_1.EventEmitter {
                     break;
                 // User Update is 8
                 case MessageType.UserUpdate:
-                    const oldUser = this.cache.users[payload.d.id];
+                    const oldUser = this.cache.users.get(payload.d.id);
                     const newUser = new User_1.default(payload.d);
-                    this.cache.users[newUser.id] = newUser;
+                    this.cache.users.set(newUser.id, newUser);
                     this.emit('userUpdate', oldUser, newUser);
                     break;
                 // Member Create is 9
