@@ -1,3 +1,5 @@
+import { threadId } from "worker_threads";
+
 export default class CacheObject extends Object {
   constructor(object = {}) {
     super();
@@ -15,6 +17,13 @@ export default class CacheObject extends Object {
 
   delete(key: string) {
     delete this[key];
+    return this;
+  }
+
+  clear() {
+    this.keys().forEach(key => {
+      delete this[key];
+    });
     return this;
   }
 
