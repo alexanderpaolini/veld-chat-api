@@ -3,6 +3,7 @@ type RawUser = {
   name: string,
   avatarUrl: string,
   isBot: boolean,
+  badges: number
 }
 
 export default RawUser;

@@ -4,6 +4,7 @@ declare class User {
     name: string;
     avatarURL: string | null;
     bot: boolean;
+    badges: string[];
     constructor(data: RawUser);
 }
 export default User;
