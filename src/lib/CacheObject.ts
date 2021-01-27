@@ -1,5 +1,3 @@
-import { threadId } from "worker_threads";
-
 export default class CacheObject extends Object {
   constructor(object = {}) {
     super();

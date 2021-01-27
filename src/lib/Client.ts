@@ -4,10 +4,11 @@ import fetch from 'node-fetch';
 
 import Channel from './Channel';
 import Message from './Message';
-
 import User from './User';
+
 import RawChannel from '../types/RawChannel';
 import RawUser from '../types/RawUser';
+
 import CacheObject from './CacheObject';
 
 enum MessageType {
@@ -206,7 +207,6 @@ class Client extends EventEmitter {
     const body = { channel: channelName };
     return await this._request('POST', 'channels/join', body);
   }
-
 }
 
 export default Client;
