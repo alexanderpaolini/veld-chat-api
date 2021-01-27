@@ -4,7 +4,7 @@ class User {
     constructor(data) {
         this.id = data.id;
         this.name = data.name;
-        this.avatarURL = `https://cdn.miki.bot/chat/avatars/${Number(this.id) % 5}.png`;
+        this.avatarURL = `https://cdn.miki.bot/chat/avatars/${data.avatarUrl || Number(this.id) % 5}.png`;
         this.bot = (data.badges & 4) === 4;
         this.badges = [];
         if ((data.badges & 4) === 4)
