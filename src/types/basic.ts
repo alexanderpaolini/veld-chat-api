@@ -13,8 +13,8 @@ export enum MessageType {
 }
 
 export interface WebSocketPayload {
-  t: MessageType;
-  d: any;
+  t: MessageType
+  d: any
 }
 
 export interface APIEmbed {

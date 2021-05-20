@@ -1,10 +1,10 @@
-import { APIUser } from "./user";
+import { APIEmbed, APIUser } from '.'
 
-export type APIMessage = {
-  id: string;
-  embed: null;
-  content: string;
-  author: APIUser;
-  timestamp: string;
-  channelId: string;
+export interface APIMessage {
+  id: string
+  embed: null | APIEmbed
+  content: string
+  author: APIUser
+  timestamp: string
+  channelId: string
 }

@@ -1,4 +1,4 @@
-export type APIUser = {
+export interface APIUser {
   id: string
   name: string
   avatarUrl: string
@@ -7,7 +7,7 @@ export type APIUser = {
   status?: UserStatus
 }
 
-export type UserStatus = {
+export interface UserStatus {
   statusText?: string
   statusType: StatusType
 }
