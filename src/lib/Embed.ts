@@ -13,6 +13,7 @@ class Embed {
     imageUrl?: string;
     thumbnailUrl?: string;
   }
+
   constructor() {
     this.embed = {};
   }

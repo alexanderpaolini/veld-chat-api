@@ -1,4 +1,5 @@
 import { EventEmitter } from 'events';
+
 import WebSocket from 'ws';
 import fetch from 'node-fetch';
 
@@ -6,38 +7,13 @@ import Channel from './Channel';
 import Message from './Message';
 import User from './User';
 
-import RawChannel from '../types/RawChannel';
-import RawUser from '../types/RawUser';
+import { APIChannel, APIUser, StatusType, MessageType, WebSocketPayload } from '../types';
 
-import CacheObject from './CacheObject';
-
-enum MessageType {
-  Authorize = 0,
-  Ready = 1,
-  MessageCreate = 2,
-  MessageUpdate = 3,
-  MessageDelete = 4,
-  UserUpdate = 8,
-  MemberCreate = 9,
-  MemberDelete = 11,
-  PresenceUpdate = 12,
-  Heartbeat = 1000,
-  HeartbeatAck = 1001,
-}
-
-enum StatusType {
-  Online = 0,
-  Offline = 1
-}
-
-interface WebSocketPayload {
-  t: MessageType;
-  d: any;
-}
+import Collection from '@discordjs/collection'
 
 interface ClientCache {
-  channels: CacheObject;
-  users: CacheObject;
+  channels: Collection<string, Channel>;
+  users: Collection<string, User>;
 }
 
 interface ClientOptions {
@@ -47,12 +23,16 @@ interface ClientOptions {
 
 class Client extends EventEmitter {
   connection: number;
+  /**
+   * Whether or not the client is connected
+   */
   isConnected: boolean;
   options: ClientOptions;
   websocket: WebSocket;
   cache: ClientCache;
   user: User;
   restPing: number;
+
   private token: string;
 
   constructor(options?: ClientOptions) {
@@ -60,8 +40,8 @@ class Client extends EventEmitter {
     this.options = Object.assign(options || {}, { host: 'api.veld.chat', heartbeatInterval: 15000 });
     this.isConnected = false;
     this.cache = {
-      channels: new CacheObject(),
-      users: new CacheObject()
+      channels: new Collection(),
+      users: new Collection()
     };
   }
 
@@ -109,16 +89,15 @@ class Client extends EventEmitter {
         // Ready is 1
         case MessageType.Ready:
           this.user = new User(payload.d.user);
-          payload.d.channels.forEach((channel: RawChannel) => {
+          payload.d.channels.forEach((channel: APIChannel) => {
             this.cache.channels.set(channel.id, new Channel(channel, this));
           });
           this.emit('ready', this.user);
-          this.fetchUsers('1').then((users: RawUser[]) => {
-            users.forEach((user: RawUser) => {
+          this.fetchUsers('1').then((users: APIUser[]) => {
+            users.forEach((user: APIUser) => {
               this.cache.users.set(user.id, new User(user));
             })
           })
-          // while (!this.user.bot) {};
           break;
 
         // MessageCreate is 2

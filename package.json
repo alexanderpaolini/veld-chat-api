@@ -6,6 +6,7 @@
     "url": "https://github.com/Million900o/veld-chat-api/issues"
   },
   "dependencies": {
+    "@discordjs/collection": "^0.1.6",
     "node-fetch": "^2.6.1",
     "ws": "^7.4.2"
   },

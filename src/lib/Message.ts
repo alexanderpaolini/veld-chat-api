@@ -1,16 +1,38 @@
-import RawMessage from "../types/RawMessage";
+import { APIMessage, APIEmbed } from "../types";
+
 import Channel from "./Channel";
 import Client from "./Client";
 import User from "./User";
 
+/**
+ * Message Class
+ */
 class Message {
+  /**
+   * Message ID
+   */
   id: string;
+  /**
+   * Message Content
+   */
   content: string;
-  embed: string;
+  /**
+   * The embed in the message
+   */
+  embed?: APIEmbed;
+  /**
+   * Author of the message
+   */
   author: User;
+  /**
+   * When the message was created, I think?
+   */
   timestamp: Date;
+  /**
+   * The channel of the message
+   */
   channel: Channel;
-  constructor(data: RawMessage, client: Client) {
+  constructor(data: APIMessage, private readonly client: Client) {
     this.id = data.id;
     this.content = data.content;
     this.embed = data.embed;
